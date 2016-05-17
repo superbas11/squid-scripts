@@ -38,12 +38,13 @@ while (<>) {
    if ($_ =~ /(.*\.(png|bmp|tiff|ico|jpg|jpeg))/i) {                         # Image format
       if ($debug == 1) { print DEBUG "Input: $url\n"; }                          # Let the user know
 
+      $ext = ($url =~ m/([^.]+)$/)[0];
       $file = "$baseDir/$pid-$count";                                            # Set filename + path
       $filename = "$pid-$count";                                                 # Set filename
 
-      getstore($url,$file);                                                      # Save image
-      system("chmod", "a+r", "$file");                                        # Allow access to the file
-      if ($debug == 1) { print DEBUG "Fetched image: $file\n"; }                 # Let the user know
+      getstore($url,"$file.$ext");                                                      # Save image
+      system("chmod", "a+r", "$file.$ext");                                        # Allow access to the file
+      if ($debug == 1) { print DEBUG "Fetched image: $file.$ext\n"; }                 # Let the user know
 
       $asciify = 1;                                                              # We need to do something with the image
    }
@@ -54,12 +55,12 @@ while (<>) {
 
    if ($asciify == 1) {                                                          # Do we need to do something?
       if ($_ !=~ /(.*\.(jpg|jpeg))/i) {                                          # Select everything other image type to jpg
-         system("$convert", "$file", "$file.jpg");                               # Convert images so they are all jpgs for jp2a
+         system("$convert", "$file.$ext", "$file.jpg");                               # Convert images so they are all jpgs for jp2a
          #system("rm", "$file");                                                 # Remove originals
          if ($debug == 1) { print DEBUG "Converted to jpg: $file.jpg\n"; }       # Let the user know
       }
       else {
-         system("mv", "$file", "$file.jpg");
+         system("mv", "$file.$ext", "$file.jpg");
       }
       system("chmod", "a+r", "$file.jpg");                                       # Allow access to the file
 
@@ -67,13 +68,13 @@ while (<>) {
       chomp $size;
       if ($debug == 1) { print DEBUG "Image size: $size ($file)\n"; }
 
-      system("$jp2a $file.jpg --invert | $convert -font Courier-Bold label:\@- -size $size $file-ascii.png");   # PNGs are smaller than jpg
+      system("$jp2a $file.jpg --invert | $convert -font Courier-Bold label:\@- -size $size $file-ascii.$ext");   # PNGs are smaller than jpg
       #system("rm $file.jpg");
-      system("chmod", "a+r", "$file-ascii.png");
-      if ($debug == 1) { print DEBUG "Asciify: $file-ascii.png\n"; }
+      system("chmod", "a+r", "$file-ascii.$ext");
+      if ($debug == 1) { print DEBUG "Asciify: $file-ascii.$ext\n"; }
 
-      print "$baseURL/$filename-ascii.png\n";
-      if ($debug == 1) { print DEBUG "Output: $baseURL/$filename-ascii.png, From: $url\n"; }
+      print "$baseURL/$filename-ascii.$ext\n";
+      if ($debug == 1) { print DEBUG "Output: $baseURL/$filename-ascii.$ext, From: $url\n"; }
    }
    $asciify = 0;
    $count++;
