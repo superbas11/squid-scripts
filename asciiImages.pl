@@ -10,13 +10,14 @@ use IO::Handle;
 use LWP::Simple;
 use POSIX strftime;
 
-$debug = 0;                               # Debug mode - create log file
-$ourIP = "192.168.0.33";                  # Our IP address
-$baseDir = "/var/www/tmp";                # Needs be writable by 'nobody'
-$baseURL = "http://".$ourIP."/tmp";       # Location on websever
+$debug = 1;                               # Debug mode - create log file
+$ourIP = "127.0.0.1";                  # Our IP address
+$baseDir = "/var/www/html/images";                # Needs be writable by 'nobody'
+$baseURL = "http://".$ourIP."/images";       # Location on websever
 $convert = "/usr/bin/convert";            # Path to convert
 $identify = "/usr/bin/identify";          # Path to identify
 $jp2a = "/usr/bin/jp2a";                  # Path to jp2a
+$ENV{TERM} = 'xterm';
 
 $|=1;
 $asciify = 0;
@@ -32,8 +33,9 @@ print DEBUG "###################################################################
 system("killall convert");
 while (<>) {
    chomp $_;
-   if ($_ =~ /(.*\.(gif|png|bmp|tiff|ico|jpg|jpeg))/i) {                         # Image format(s)
-      $url = $1;                                                                 # Get URL
+   #print DEBUG "Input string: $_\n";
+   ($url, $ip, $ident, $method, @kvpair) = split(" ",$_);
+   if ($_ =~ /(.*\.(png|bmp|tiff|ico|jpg|jpeg))/i) {                         # Image format
       if ($debug == 1) { print DEBUG "Input: $url\n"; }                          # Let the user know
 
       $file = "$baseDir/$pid-$count";                                            # Set filename + path
@@ -46,8 +48,8 @@ while (<>) {
       $asciify = 1;                                                              # We need to do something with the image
    }
    else {                                                                        # Everything not a image
-      print "$_\n";                                                              # Just let it go
-      if ($debug == 1) { print DEBUG "Pass: $_\n"; }                             # Let the user know
+      print "$url\n";                                                              # Just let it go
+      if ($debug == 1) { print DEBUG "Pass: $url\n"; }                             # Let the user know
    }
 
    if ($asciify == 1) {                                                          # Do we need to do something?
